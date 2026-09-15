@@ -1,0 +1,18 @@
+[project]
+name = "chestnut"
+version = "0.1.0"
+requires-python = ">=3.11,<3.13"
+dependencies = ["tinygrad==0.14.0", "numpy==2.3.3", "jinja2==3.1.6"]
+
+[project.optional-dependencies]
+speech = ["librosa==0.11.0", "tiktoken==0.11.0"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+tinygrad = {path = "tinygrad_repo", editable = true}
+
+[tool.ruff]
+line-length = 140
+indent-width = 2
