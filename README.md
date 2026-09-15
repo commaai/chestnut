@@ -1,43 +1,73 @@
 # chestnut
 
+Examples run on PC and Chestnut.
+
+![Chestnut connections](chestnut.png)
+
 ## Setup
 
 ```sh
 ./setup.sh
-. .venv/bin/activate
-python tools/usb.py
 ```
 
-## Examples
+Installs dependencies
 
-Inference on Chestnut. First run downloads and compiles the models.
+**Device: `DEV=CPU` (PC, default) or `DEV=USB+AMD:LLVM` (Chestnut).**
 
 ### Chat
 
-Local chat with Qwen3.5
-
 ```sh
-python examples/01_chat.py --model qwen3.5:0.8b
-python examples/01_chat.py --model qwen3.5:9b
-python examples/01_chat.py --max_context 2048
-python examples/01_chat.py --benchmark 20
+.venv/bin/python examples/01_chat.py
+DEV=USB+AMD:LLVM .venv/bin/python examples/01_chat.py
 ```
 
-### Transcribe
+Llama 3.2 1B, tinygrad's default chat model.
 
-Audio to English text with Whisper.
-
-```sh
-python examples/02_transcribe.py recording.wav --model tiny.en
-python examples/02_transcribe.py recording.wav --model base.en
-python examples/02_transcribe.py recording.wav --model small.en
-python examples/02_transcribe.py recording.wav --model medium.en
-```
-
-### Openpilot
-
-Driving model benchmark with synthetic inputs.
+### YOLO
 
 ```sh
-python examples/03_openpilot.py /data/openpilot/openpilot/selfdrive/modeld/models/driving_supercombo.onnx
+.venv/bin/python examples/02_vision.py bus.jpg --output boxes.jpg
+.venv/bin/python examples/02_vision.py bus.jpg --model segment --output masks.jpg
 ```
+
+YOLO26 detection and segmentation masks.
+
+### Camera
+
+```sh
+.venv/bin/python examples/03_camera.py --source 0
+.venv/bin/python examples/03_camera.py --source video.mp4 --model segment
+```
+
+Source can be webcam, video, or stream URL. Saves annotated images to `frames/`.
+
+```sh
+DEV=USB+AMD:LLVM .venv/bin/python examples/03_camera.py --source comma
+DEV=USB+AMD:LLVM .venv/bin/python examples/03_camera.py --source comma --model segment
+```
+
+Uses openpilot’s camera stream.
+
+### Check Chestnut
+
+```sh
+.venv/bin/python tools/usb.py
+```
+
+Finds Chestnut over USB and verifies a calculation on its GPU. For `PCIe link not up`, check GPU power
+
+### Benchmark PC vs Chestnut
+
+```sh
+.venv/bin/python tools/benchmark.py models/yolo26n.onnx
+DEV=USB+AMD:LLVM .venv/bin/python tools/benchmark.py models/yolo26n.onnx
+```
+
+Use `models/yolo26n-seg.onnx` for segmentation, or pass another ONNX model.
+
+| Model | PC CPU | Chestnut | Speedup |
+| --- | ---: | ---: | ---: |
+| YOLO26n | 524.57 ms | 15.12 ms | 35× |
+| YOLO26n-seg | 705.44 ms | 16.44 ms | 43× |
+
+320×320 FP32, model inference only. PC: Threadripper PRO 5945WX.

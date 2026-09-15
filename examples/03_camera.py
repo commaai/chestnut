@@ -1,0 +1,63 @@
+import argparse
+from pathlib import Path
+import subprocess
+import sys
+import cv2
+import numpy as np
+from vision import Vision
+
+
+def comma_frames():
+  checkout = Path('/data/openpilot')
+  sys.path.append(str(checkout))
+  from msgq.visionipc import VisionIpcClient
+  process = None
+  if subprocess.run(['pgrep', '-x', 'camerad'], stdout=subprocess.DEVNULL).returncode:
+    process = subprocess.Popen([str(checkout / 'openpilot/system/camerad/camerad')],
+                               cwd=checkout, stdout=subprocess.DEVNULL)
+  try:
+    client = VisionIpcClient('camerad', 0, True)
+    client.connect(True)
+    while True:
+      buf = client.recv()
+      if buf is None: continue
+      y = np.ndarray((buf.height, buf.width), np.uint8, buf.data, strides=(buf.stride, 1))
+      uv = np.ndarray((buf.height//2, buf.width//2, 2), np.uint8, buf.data,
+                      offset=buf.uv_offset, strides=(buf.stride, 2, 1))
+      yield cv2.cvtColorTwoPlane(y, uv, cv2.COLOR_YUV2BGR_NV12)
+  finally:
+    if process is not None:
+      process.terminate()
+      process.wait()
+
+
+def video_frames(source):
+  capture = cv2.VideoCapture(int(source) if source.isdecimal() else source)
+  try:
+    if not capture.isOpened(): raise RuntimeError(f'Cannot open {source}')
+    while True:
+      ok, frame = capture.read()
+      if not ok: break
+      yield frame
+  finally:
+    capture.release()
+
+
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description='YOLO26 on a webcam, video, or comma camera.')
+  parser.add_argument('--source', default='0', help='Webcam number, video/URL, or comma')
+  parser.add_argument('--model', choices=['yolo', 'segment'], default='yolo')
+  parser.add_argument('--frames', type=int, default=10)
+  args = parser.parse_args()
+
+  model = Vision(args.model)
+  Path('frames').mkdir(exist_ok=True)
+  stream = comma_frames() if args.source == 'comma' else video_frames(args.source)
+  print('Saving to frames/.', flush=True)
+  try:
+    for i, frame in enumerate(stream):
+      model(frame).save(f'frames/{i:05d}.jpg')
+      print(f'Frame {i + 1}', flush=True)
+      if i + 1 >= args.frames: break
+  finally:
+    stream.close()

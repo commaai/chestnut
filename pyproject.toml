@@ -2,16 +2,25 @@
 name = "chestnut"
 version = "0.1.0"
 requires-python = ">=3.11,<3.13"
-dependencies = ["tinygrad==0.14.0", "numpy==2.3.3", "jinja2==3.1.6"]
-
-[project.optional-dependencies]
-speech = ["librosa==0.11.0", "tiktoken==0.11.0"]
+dependencies = [
+  "tinygrad", "jinja2==3.1.6", "numpy==2.3.5",
+  "opencv-python-headless>=4.11,<5",
+  "ultralytics-opencv-headless==8.4.153", "onnx>=1.17,<2", "torch>=2.5", "torchvision>=0.20",
+]
 
 [tool.uv]
 package = false
 
 [tool.uv.sources]
-tinygrad = {path = "tinygrad_repo", editable = true}
+# PyPI 0.13 lacks Chestnut's USB ID; 0.14 omits chat kernels.
+tinygrad = {url = "https://github.com/tinygrad/tinygrad/archive/cc32aa18db3a8ff277f2649a5f93540df1e4c0ee.tar.gz"}
+torch = {index = "pytorch-cpu"}
+torchvision = {index = "pytorch-cpu"}
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 line-length = 140
