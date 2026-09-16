@@ -47,7 +47,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='YOLO26 on a webcam, video, or comma camera.')
   parser.add_argument('--source', default='0', help='Webcam, video/URL, or comma:road, comma:driver, comma:wide')
   parser.add_argument('--model', choices=['yolo', 'segment'], default='yolo')
-  parser.add_argument('--frames', type=int, default=10)
+  parser.add_argument('--frames', type=int, default=10, help='Frames to save without preview')
   parser.add_argument('--preview', action='store_true', help='Show a live preview window')
   args = parser.parse_args()
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         cv2.imshow('chestnut', result.plot())
         if cv2.waitKey(1) == 27: break
       print(f'Frame {i + 1}', flush=True)
-      if i + 1 >= args.frames: break
+      if not args.preview and i + 1 >= args.frames: break
   finally:
     stream.close()
     if args.preview: cv2.destroyAllWindows()
