@@ -27,7 +27,6 @@ async def main():
   args = parser.parse_args()
   if args.source.startswith('comma') and not args.host: parser.error('--host is required for a comma camera')
 
-  model = Vision(args.model)
   Path('frames').mkdir(exist_ok=True)
   comma_streams = {'comma': 'road', 'comma:road': 'road', 'comma:wide': 'wideRoad', 'comma:driver': 'driver'}
   if args.source in comma_streams:
@@ -35,14 +34,22 @@ async def main():
     stream = frames(args.host, comma_streams[args.source])
   else:
     stream = video_frames(args.source)
-  print('Saving to frames/.', flush=True)
+  print('Connecting to comma...' if args.source in comma_streams else 'Opening camera...', flush=True)
+  model = None
   try:
     i = 0
     while True:
       try: frame = await anext(stream) if args.source in comma_streams else next(stream)
       except (StopAsyncIteration, StopIteration): break
+      if model is None:
+        if args.preview:
+          cv2.imshow('chestnut', frame)
+          cv2.waitKey(1)
+        print('Compiling model', flush=True)
+        model = Vision(args.model)
+      if i == 0: print('Running first inference (can take a while)', flush=True)
       result = model(frame)
-      result.save(f'frames/{i:05d}.jpg')
+      if not args.preview: result.save(f'frames/{i:05d}.jpg')
       if args.preview:
         cv2.imshow('chestnut', result.plot())
         if cv2.waitKey(1) == 27: break
