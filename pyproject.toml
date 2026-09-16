@@ -1,13 +1,15 @@
 [project]
 name = "chestnut"
 version = "0.1.0"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.12,<3.13"
 dependencies = [
   "tinygrad",
   "jinja2==3.1.6",
   "numpy==2.3.5",
-  "opencv-python-headless>=4.11,<5",
-  "ultralytics-opencv-headless==8.4.153",
+  "opencv-python>=4.11,<5",
+  "ultralytics==8.4.153",
+  "av>=15,<17",
+  "teleoprtc @ https://github.com/commaai/teleoprtc/archive/1aa8fc433bef1519a95c0700c96258c3be6dfb34.tar.gz",
   "onnx>=1.17,<2",
   "torch>=2.5",
   "torchvision>=0.20",

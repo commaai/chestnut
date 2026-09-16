@@ -15,18 +15,20 @@ case "$(uname -s):$(uname -m)" in
     getconf GNU_LIBC_VERSION >/dev/null || { echo 'glibc Linux is required.' >&2; exit 1; }
     ;;
   Darwin:arm64)
-    [ "$(sw_vers -productVersion | cut -d. -f1)" -ge 14 ] || { echo 'macOS 14+ is required.' >&2; exit 1; }
+    [ "$(sw_vers -productVersion | cut -d. -f1)" -ge 15 ] || { echo 'macOS 15+ is required.' >&2; exit 1; }
     command -v brew >/dev/null || { echo 'Install Homebrew and rerun setup.' >&2; exit 1; }
     brew list --versions llvm@21 libusb >/dev/null 2>&1 || brew install llvm@21 libusb
     export PATH="/opt/homebrew/opt/llvm@21/bin:$PATH"
     ;;
-  *) echo 'Use x86_64/aarch64 Linux or Apple Silicon macOS 14+.' >&2; exit 1 ;;
+  *) echo 'Use x86_64/aarch64 Linux or Apple Silicon macOS 15+.' >&2; exit 1 ;;
 esac
 
 if [ "$(uname -s)" = Linux ] && { ! command -v clang >/dev/null || ! command -v curl >/dev/null ||
-   ! command -v awk >/dev/null || ! command -v tar >/dev/null || ! command -v gzip >/dev/null ||
+   ! command -v awk >/dev/null || ! command -v find >/dev/null || ! command -v tar >/dev/null || ! command -v gzip >/dev/null ||
    ! ldconfig -p 2>/dev/null | grep -E 'libLLVM(-|\.so\.)(19|20|21)' >/dev/null ||
-   ! ldconfig -p 2>/dev/null | grep -F 'libusb-1.0.so' >/dev/null; }; then
+   ! ldconfig -p 2>/dev/null | grep -F 'libusb-1.0.so' >/dev/null ||
+   ! ldconfig -p 2>/dev/null | grep -F 'libGL.so.1' >/dev/null ||
+   ! ldconfig -p 2>/dev/null | grep -F 'libgthread-2.0.so.0' >/dev/null; }; then
   if command -v apt-get >/dev/null; then
     "${as_root[@]}" apt-get update
     llvm_package=
@@ -49,14 +51,14 @@ if [ "$(uname -s)" = Linux ] && { ! command -v clang >/dev/null || ! command -v 
       "${as_root[@]}" apt-get update
       llvm_package=libllvm20
     fi
-    "${as_root[@]}" apt-get install -y --no-install-recommends ca-certificates curl clang "$llvm_package" libusb-1.0-0 gawk tar gzip
+    "${as_root[@]}" apt-get install -y --no-install-recommends ca-certificates curl clang "$llvm_package" libusb-1.0-0 libgl1 libglib2.0-0 libxcb1 findutils gawk tar gzip
   elif command -v dnf >/dev/null; then
-    "${as_root[@]}" dnf install -y ca-certificates clang llvm-libs libusb1 curl gawk tar gzip
+    "${as_root[@]}" dnf install -y ca-certificates clang llvm-libs libusb1 mesa-libGL glib2 libxcb findutils curl gawk tar gzip
   elif command -v pacman >/dev/null; then
-    "${as_root[@]}" pacman -Syu --needed --noconfirm ca-certificates clang llvm20-libs libusb curl gawk tar gzip
+    "${as_root[@]}" pacman -Syu --needed --noconfirm ca-certificates clang llvm20-libs libusb libglvnd glib2 libxcb findutils curl gawk tar gzip
   elif command -v zypper >/dev/null; then
     "${as_root[@]}" zypper --non-interactive refresh
-    "${as_root[@]}" zypper --non-interactive install ca-certificates clang libLLVM20 libusb-1_0-0 curl gawk tar gzip
+    "${as_root[@]}" zypper --non-interactive install ca-certificates clang libLLVM20 libusb-1_0-0 libglvnd libglib-2_0-0 libgthread-2_0-0 libxcb1 findutils curl gawk tar gzip
   else
     echo 'Install clang, curl, LLVM 19–21, and libusb with your package manager.' >&2
     exit 1
