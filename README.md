@@ -83,6 +83,7 @@ DEV=USB+AMD:LLVM python examples/03_camera.py --source 0
 
 On a comma device, run setup and activate the environment as above. Requires openpilot at `/data/openpilot`.
 Select the road, driver, or wide road camera with `--source comma:road`, `comma:driver`, or `comma:wide`.
+Add `--model segment` to any camera command for segmentation.
 
 ```sh
 # Comma CPU
