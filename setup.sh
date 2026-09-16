@@ -84,7 +84,9 @@ if ! command -v uv >/dev/null; then
   download https://astral.sh/uv/install.sh .cache/install-uv.sh
   UV_NO_MODIFY_PATH=1 sh .cache/install-uv.sh
 fi
+unset VIRTUAL_ENV
 uv sync --locked --python 3.12
 .venv/bin/python tools/setup.py
+echo 'Preparing models...'
 .venv/bin/python tools/export.py
 echo 'Ready. Activate with: source .venv/bin/activate'
