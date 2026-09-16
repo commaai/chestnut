@@ -1,6 +1,6 @@
 # chestnut
 
-Run chat, object detection, segmentation, and image classification with tinygrad on your PC or Chestnut.
+Run chat, object detection, segmentation, and image classification with tinygrad on your PC or chestnut.
 
 ## Setup
 
@@ -42,10 +42,12 @@ python examples/02_vision.py zidane.jpg --model segment --output masks.jpg
 
 Run YOLO26 detection or segmentation on a webcam.
 Use `--frames 100` for more. `--source` also accepts a video path or stream URL.
+Add `--preview` for a live window that runs until you press Esc.
 
 ```sh
 python examples/03_camera.py --source 0
 python examples/03_camera.py --source 0 --model segment
+python examples/03_camera.py --source 0 --preview
 ```
 
 ### Image classification
@@ -54,14 +56,14 @@ Print the five most likely labels with ResNet18.
 
 ```sh
 python examples/04_classify.py
-python examples/04_classify.py photo.jpg
+python examples/04_classify.py zidane.jpg
 ```
 
-## Run on Chestnut
+## Run on chestnut
 
-Plug in the 12V power and connect the USB3 cable from Chestnut's USB3.2 port to your PC or comma.
+Plug in the 12V power and connect the USB3 cable from chestnut's USB3.2 port to your PC or comma.
 
-![Chestnut connections](chestnut.png)
+![chestnut connections](chestnut.jpg)
 
 In the activated environment, check the connection:
 
@@ -69,9 +71,9 @@ In the activated environment, check the connection:
 python tools/usb.py
 ```
 
-Expected: `Chestnut GPU check passed.`
+Expected: `chestnut GPU check passed.`
 
-Prefix any example command with `DEV=USB+AMD:LLVM` to run it on Chestnut's GPU:
+Prefix any example command with `DEV=USB+AMD:LLVM` to run it on chestnut's GPU:
 
 ```sh
 DEV=USB+AMD:LLVM python examples/01_chat.py
@@ -82,21 +84,26 @@ DEV=USB+AMD:LLVM python examples/03_camera.py --source 0
 ## Comma camera
 
 On a comma device, run setup and activate the environment as above. Requires openpilot at `/data/openpilot`.
-`--source comma` selects its camera. Add `--model segment` for segmentation.
+Select the road, driver, or wide road camera with `--source comma:road`, `comma:driver`, or `comma:wide`.
+Add `--model segment` to any camera command for segmentation.
 
 ```sh
 # Comma CPU
-python examples/03_camera.py --source comma
+python examples/03_camera.py --source comma:road
+python examples/03_camera.py --source comma:driver
+python examples/03_camera.py --source comma:wide
 
-# Chestnut GPU connected to comma
-DEV=USB+AMD:LLVM python examples/03_camera.py --source comma
+# chestnut GPU connected to comma
+DEV=USB+AMD:LLVM python examples/03_camera.py --source comma:road
+DEV=USB+AMD:LLVM python examples/03_camera.py --source comma:driver
+DEV=USB+AMD:LLVM python examples/03_camera.py --source comma:wide
 ```
 
 ## Performance
 
 PC CPU: Threadripper PRO 5945WX. Comma CPU: Qualcomm SDM845.
 
-| Model | PC CPU | Comma CPU | Chestnut GPU |
+| Model | PC CPU | Comma CPU | chestnut GPU |
 | --- | ---: | ---: | ---: |
 | YOLO26n | 526.07 ms | 1846.42 ms | 7.02 ms |
 | YOLO26n-seg | 704.56 ms | 2349.27 ms | 7.98 ms |
