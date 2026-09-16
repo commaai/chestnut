@@ -82,9 +82,4 @@ fi
 uv sync --locked --python 3.12
 .venv/bin/python tools/setup.py
 .venv/bin/python tools/export.py
-if [ ! -f zidane.jpg ]; then
-  download https://ultralytics.com/images/zidane.jpg .cache/zidane.jpg
-  mv .cache/zidane.jpg zidane.jpg
-fi
-
 echo 'Ready. Activate with: source .venv/bin/activate'

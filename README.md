@@ -61,7 +61,7 @@ python examples/04_classify.py zidane.jpg
 
 Plug in the 12V power and connect the USB3 cable from chestnut's USB3.2 port to your PC or comma.
 
-![chestnut connections](chestnut.png)
+![chestnut connections](chestnut.jpg)
 
 In the activated environment, check the connection:
 
