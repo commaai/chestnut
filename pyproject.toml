@@ -3,9 +3,14 @@ name = "chestnut"
 version = "0.1.0"
 requires-python = ">=3.11,<3.13"
 dependencies = [
-  "tinygrad", "jinja2==3.1.6", "numpy==2.3.5",
+  "tinygrad",
+  "jinja2==3.1.6",
+  "numpy==2.3.5",
   "opencv-python-headless>=4.11,<5",
-  "ultralytics-opencv-headless==8.4.153", "onnx>=1.17,<2", "torch>=2.5", "torchvision>=0.20",
+  "ultralytics-opencv-headless==8.4.153",
+  "onnx>=1.17,<2",
+  "torch>=2.5",
+  "torchvision>=0.20",
 ]
 
 [tool.uv]
