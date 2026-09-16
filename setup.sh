@@ -3,6 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
 export UV_CACHE_DIR="${UV_CACHE_DIR:-$PWD/.cache/uv}"
+export TORCH_HOME="${TORCH_HOME:-$PWD/.cache/torch}"
 export UV_HTTP_TIMEOUT=200 UV_HTTP_RETRIES=5
 mkdir -p .cache
 
