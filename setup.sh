@@ -2,12 +2,18 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
-export UV_CACHE_DIR="${UV_CACHE_DIR:-$PWD/.cache/uv}"
+export UV_CACHE_DIR="$PWD/.cache/uv"
+export TORCH_HOME="$PWD/.cache/torch"
 export UV_HTTP_TIMEOUT=200 UV_HTTP_RETRIES=5
 mkdir -p .cache
 
 as_root=()
 if [ "$EUID" -ne 0 ]; then as_root=(sudo); fi
+for directory in .cache .venv models frames; do
+  if [ -d "$directory" ] && [ -n "$(find "$directory" ! -user "$(id -un)" -print -quit)" ]; then
+    "${as_root[@]}" chown -R "$(id -u):$(id -g)" "$directory"
+  fi
+done
 download() { curl --retry 5 --retry-delay 5 --retry-all-errors -fLsS "$1" -o "$2"; }
 
 case "$(uname -s):$(uname -m)" in
@@ -79,7 +85,9 @@ if ! command -v uv >/dev/null; then
   download https://astral.sh/uv/install.sh .cache/install-uv.sh
   UV_NO_MODIFY_PATH=1 sh .cache/install-uv.sh
 fi
+unset VIRTUAL_ENV
 uv sync --locked --python 3.12
 .venv/bin/python tools/setup.py
+echo 'Preparing models...'
 .venv/bin/python tools/export.py
 echo 'Ready. Activate with: source .venv/bin/activate'

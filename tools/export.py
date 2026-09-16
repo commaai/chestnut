@@ -13,3 +13,4 @@ if not (folder / 'resnet18.onnx').exists():
   model = resnet18(weights=ResNet18_Weights.DEFAULT).eval()
   torch.onnx.export(model, torch.zeros(1, 3, 224, 224), folder / 'resnet18.onnx',
                     input_names=['image'], output_names=['scores'], opset_version=17, dynamo=False)
+print('Models ready.', flush=True)
