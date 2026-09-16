@@ -52,11 +52,11 @@ if ! command -v uv >/dev/null; then
 fi
 uv sync --locked --python 3.12
 .venv/bin/python tools/export.py
-if [ ! -f bus.jpg ]; then
+if [ ! -f zidane.jpg ]; then
   mkdir -p .cache
-  curl --retry 5 --retry-delay 5 --retry-all-errors -fLsS https://ultralytics.com/images/bus.jpg -o .cache/bus.jpg
-  mv .cache/bus.jpg bus.jpg
+  curl --retry 5 --retry-delay 5 --retry-all-errors -fLsS https://ultralytics.com/images/zidane.jpg -o .cache/zidane.jpg
+  mv .cache/zidane.jpg zidane.jpg
 fi
 
-echo "Ready. PC: .venv/bin/python examples/02_vision.py bus.jpg"
-echo "Chestnut: DEV=USB+AMD:LLVM .venv/bin/python examples/02_vision.py bus.jpg"
+echo "Ready. PC: .venv/bin/python examples/02_vision.py zidane.jpg"
+echo "Chestnut: DEV=USB+AMD:LLVM .venv/bin/python examples/02_vision.py zidane.jpg"
