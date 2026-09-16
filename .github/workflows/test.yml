@@ -1,15 +1,55 @@
 name: examples
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: examples-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   cpu:
+    timeout-minutes: 60
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-24.04-arm]
+        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-24.04-arm, macos-14, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - run: ./setup.sh
-      - run: |
-          .venv/bin/python examples/01_chat.py --help
-          .venv/bin/python examples/02_vision.py chestnut.png
-          .venv/bin/python examples/02_vision.py chestnut.png --model segment
+      - uses: actions/checkout@v7
+      - name: Setup from a clean environment
+        run: ./setup.sh
+      - name: Setup is repeatable
+        run: ./setup.sh
+      - name: Run every example
+        run: .venv/bin/python .github/test_examples.py
+      - name: Setup leaves tracked files unchanged
+        run: git diff --exit-code
+
+  linux-distros:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [ubuntu:22.04, ubuntu:24.04, debian:12, debian:13, fedora:43, archlinux:base, opensuse/tumbleweed:latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Fresh container setup and inference
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: |
+          docker run --rm -v "$PWD:/src:ro" "$IMAGE" bash -c '
+            set -e
+            mkdir /work
+            cp -a /src/. /work/
+            cd /work
+            ./setup.sh
+            ./setup.sh
+            .venv/bin/python .github/test_examples.py
+          '
