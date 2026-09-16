@@ -42,10 +42,12 @@ python examples/02_vision.py zidane.jpg --model segment --output masks.jpg
 
 Run YOLO26 detection or segmentation on a webcam.
 Use `--frames 100` for more. `--source` also accepts a video path or stream URL.
+Add `--preview` for a live window.
 
 ```sh
 python examples/03_camera.py --source 0
 python examples/03_camera.py --source 0 --model segment
+python examples/03_camera.py --source 0 --preview
 ```
 
 ### Image classification

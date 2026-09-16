@@ -40,4 +40,4 @@ for model in ('yolo', 'segment'):
       saved = cv2.imread(str(frame))
       assert saved is not None and saved.shape == image.shape
 
-assert 'Samoyed:' in run('04_classify.py')
+assert 'bow tie:' in run('04_classify.py').lower()
