@@ -8,6 +8,11 @@ mkdir -p .cache
 
 as_root=()
 if [ "$EUID" -ne 0 ]; then as_root=(sudo); fi
+for directory in .cache .venv models frames; do
+  if [ -d "$directory" ] && [ -n "$(find "$directory" ! -user "$(id -un)" -print -quit)" ]; then
+    "${as_root[@]}" chown -R "$(id -u):$(id -g)" "$directory"
+  fi
+done
 download() { curl --retry 5 --retry-delay 5 --retry-all-errors -fLsS "$1" -o "$2"; }
 
 case "$(uname -s):$(uname -m)" in
