@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 os.environ.setdefault("DEV", "CPU")
-os.environ.setdefault("XDG_CACHE_HOME", str(Path(__file__).resolve().parents[1] / ".cache"))
+os.environ["XDG_CACHE_HOME"] = str(Path(__file__).resolve().parents[1] / ".cache")
 
 import numpy as np
 import torch

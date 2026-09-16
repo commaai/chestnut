@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 os.environ.setdefault('DEV', 'CPU')
-os.environ.setdefault('XDG_CACHE_HOME', str(ROOT / '.cache'))
+os.environ['XDG_CACHE_HOME'] = str(ROOT / '.cache')
 
 from PIL import Image
 from torchvision.models import ResNet18_Weights
