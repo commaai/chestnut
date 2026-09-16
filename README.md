@@ -46,7 +46,7 @@ python examples/02_vision.py zidane.jpg --model segment --output masks.jpg
 
 Run YOLO26 detection or segmentation on a webcam.
 Use `--frames 100` for more. `--source` also accepts a video path or stream URL.
-Add `--preview` for a live window that runs until you press Esc.
+Add `--preview` for a live preview window
 
 ```sh
 python examples/03_camera.py --source 0
@@ -87,20 +87,15 @@ DEV=USB+AMD:LLVM python examples/03_camera.py --source 0
 
 ## Comma camera
 
-On a comma device, run setup and activate the environment as above. Requires openpilot at `/data/openpilot`.
 Select the road, driver, or wide road camera with `--source comma:road`, `comma:driver`, or `comma:wide`.
 Add `--model segment` to any camera command for segmentation.
 
 ```sh
-# Comma CPU
-python examples/03_camera.py --source comma:road
-python examples/03_camera.py --source comma:driver
-python examples/03_camera.py --source comma:wide
+python examples/03_camera.py --host <comma-ip> --source comma:road
+python examples/03_camera.py --host <comma-ip> --source comma:driver
+python examples/03_camera.py --host <comma-ip> --source comma:wide
 
-# chestnut GPU connected to comma
-DEV=USB+AMD:LLVM python examples/03_camera.py --source comma:road
-DEV=USB+AMD:LLVM python examples/03_camera.py --source comma:driver
-DEV=USB+AMD:LLVM python examples/03_camera.py --source comma:wide
+DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip> --source comma:road
 ```
 
 ## Performance
