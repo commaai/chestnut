@@ -1,4 +1,8 @@
-# chestnut
+# COMMA_HACK 7
+
+Welcome to [COMMA_HACK 7](https://blog.comma.ai/comma-hack-7/)!
+
+We put together this repo to help you get started with your chestnut.
 
 Run chat, object detection, segmentation, and image classification with tinygrad on your PC or chestnut.
 
@@ -101,7 +105,7 @@ DEV=USB+AMD:LLVM python examples/03_camera.py --source comma:wide
 
 ## Performance
 
-PC CPU: Threadripper PRO 5945WX. Comma CPU: Qualcomm SDM845.
+PC CPU: Threadripper PRO 5945WX. comma four CPU: Qualcomm SDM845.
 
 | Model | PC CPU | Comma CPU | chestnut GPU |
 | --- | ---: | ---: | ---: |
