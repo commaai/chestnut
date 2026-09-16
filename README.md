@@ -1,10 +1,10 @@
-# COMMA_HACK 7
-
-Welcome to [COMMA_HACK 7](https://blog.comma.ai/comma-hack-7/)!
+# Welcome to [COMMA_HACK 7](https://blog.comma.ai/comma-hack-7/)!
 
 We put together this repo to help you get started with your chestnut.
 
 Run chat, object detection, segmentation, and image classification with tinygrad on your PC or chestnut.
+
+[tinygrad](https://github.com/tinygrad/tinygrad) makes it easy to run the same code and models on different platforms, from your laptop's CPU to GPUs and even comma four. Run on your PC to test out, then plug in a chestnut for real speed.
 
 ## Setup
 
