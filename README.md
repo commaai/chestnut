@@ -85,17 +85,31 @@ DEV=USB+AMD:LLVM python examples/02_vision.py zidane.jpg --output boxes.jpg
 DEV=USB+AMD:LLVM python examples/03_camera.py --source 0
 ```
 
-## Comma camera
+## Comma cameras
 
-Select the road, driver, or wide road camera with `--source comma:road`, `comma:driver`, or `comma:wide`.
-Add `--model segment` to any camera command for segmentation.
+Stream the comma cameras to your PC. Inference runs on your PC's CPU or a chestnut connected to your PC.
+
+### Setup
+
+1. Add your PC's public SSH key to GitHub. On comma, open **Settings -> Developer**, enable **SSH**, and enter your **GitHub username** under **SSH keys**.
+2. Find the comma's IP in **Settings -> Network** and use it as `<comma-ip>` below.
+
+### Camera options
+
+- **Road:** `--source comma:road`
+- **Driver:** `--source comma:driver`
+- **Wide road:** `--source comma:wide`
+- Add `--model segment` for segmentation overlay.
+- Add `--preview` for a live preview window.
+
+Run this on your PC:
 
 ```sh
-python examples/03_camera.py --host <comma-ip> --source comma:road
-python examples/03_camera.py --host <comma-ip> --source comma:driver
-python examples/03_camera.py --host <comma-ip> --source comma:wide
+python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview 
+python examples/03_camera.py --host <comma-ip> --source comma:driver --model segment --preview
+python examples/03_camera.py --host <comma-ip> --source comma:wide --model segment --preview
 
-DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip> --source comma:road
+DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview
 ```
 
 ## Performance
