@@ -93,6 +93,7 @@ Stream the comma cameras to your PC. Inference runs on your PC's CPU or a chestn
 
 1. Add your PC's public SSH key to GitHub. On comma, open **Settings -> Developer**, enable **SSH**, and enter your **GitHub username** under **SSH keys**.
 2. Find the comma's IP in **Settings -> Network** and use it as `<comma-ip>` below.
+3. Add `-i /path/to/private_key`.
 
 ### Camera options
 
@@ -105,11 +106,11 @@ Stream the comma cameras to your PC. Inference runs on your PC's CPU or a chestn
 Run this on your PC:
 
 ```sh
-python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview 
-python examples/03_camera.py --host <comma-ip> --source comma:driver --model segment --preview
-python examples/03_camera.py --host <comma-ip> --source comma:wide --model segment --preview
+python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview -i /path/to/private_key
+python examples/03_camera.py --host <comma-ip> --source comma:driver --model segment --preview -i /path/to/private_key
+python examples/03_camera.py --host <comma-ip> --source comma:wide --model segment --preview -i /path/to/private_key
 
-DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview
+DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview -i /path/to/private_key
 ```
 
 ## Performance

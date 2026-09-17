@@ -1,8 +1,8 @@
 import argparse
 import asyncio
+import subprocess
 from pathlib import Path
 import cv2
-from vision import Vision
 
 
 def video_frames(source):
@@ -20,7 +20,8 @@ def video_frames(source):
 async def main():
   parser = argparse.ArgumentParser(description='YOLO26 on a webcam, video, or comma camera.')
   parser.add_argument('--source', default='0', help='Webcam, video/URL, or comma:road, comma:driver, comma:wide')
-  parser.add_argument('--host', help='comma IP address')
+  parser.add_argument('--host', help='comma IP address or ~/.ssh/config host alias')
+  parser.add_argument('-i', '--identity', help='SSH private key file')
   parser.add_argument('--model', choices=['yolo', 'segment'], default='yolo')
   parser.add_argument('--frames', type=int, default=10, help='Frames to save without preview')
   parser.add_argument('--preview', action='store_true', help='Show a live preview window')
@@ -31,7 +32,7 @@ async def main():
   comma_streams = {'comma': 'road', 'comma:road': 'road', 'comma:wide': 'wideRoad', 'comma:driver': 'driver'}
   if args.source in comma_streams:
     from teleop import frames
-    stream = frames(args.host, comma_streams[args.source])
+    stream = frames(args.host, comma_streams[args.source], args.identity)
   else:
     stream = video_frames(args.source)
   print('Connecting to comma...' if args.source in comma_streams else 'Opening camera...', flush=True)
@@ -45,6 +46,8 @@ async def main():
         if args.preview:
           cv2.imshow('chestnut', frame)
           cv2.waitKey(1)
+        print('Camera stream started', flush=True)
+        from vision import Vision
         print('Compiling model', flush=True)
         model = Vision(args.model)
       if i == 0: print('Running first inference (can take a while)', flush=True)
@@ -62,4 +65,9 @@ async def main():
 
 
 if __name__ == '__main__':
-  asyncio.run(main())
+  try:
+    asyncio.run(main())
+  except (RuntimeError, OSError, subprocess.CalledProcessError) as error:
+    raise SystemExit(f'Error: {error or type(error).__name__}') from None
+  except KeyboardInterrupt:
+    pass

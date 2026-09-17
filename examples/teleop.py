@@ -1,6 +1,7 @@
 import asyncio
 import json
 import socket
+import subprocess
 import urllib.request
 
 import av
@@ -9,8 +10,8 @@ from teleoprtc import StreamingOffer, WebRTCOfferBuilder
 from teleoprtc.stream import RTCSessionDescription
 
 class Connection:
-  def __init__(self, host):
-    self.host = host
+  def __init__(self, host, identity=None):
+    self.host, self.identity = host, identity
     self.tunnel = None
     self.port = None
 
@@ -20,15 +21,16 @@ class Connection:
         sock.bind(('127.0.0.1', 0))
         self.port = sock.getsockname()[1]
       self.tunnel = await asyncio.create_subprocess_exec(
-        'ssh', '-o', 'ExitOnForwardFailure=yes', '-L',
+        'ssh', *(['-i', self.identity] if self.identity else []), '-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5',
+        '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', '-o', 'GlobalKnownHostsFile=/dev/null',
+        '-o', 'ConnectionAttempts=1', '-o', 'ForkAfterAuthentication=no', '-o', 'ExitOnForwardFailure=yes', '-L',
         f'127.0.0.1:{self.port}:127.0.0.1:5001', f'comma@{self.host}',
         'cd /data/openpilot && /usr/local/venv/bin/python -c '
-        '"from openpilot.common.params import Params; Params().put_bool(\\"IsLiveStreaming\\", True)"; exec sleep 3600',
-        stdin=asyncio.subprocess.DEVNULL, stdout=asyncio.subprocess.DEVNULL,
-        stderr=asyncio.subprocess.PIPE)
-      await asyncio.sleep(0.5)
-      if self.tunnel.returncode is not None:
-        raise RuntimeError('Could not connect to comma')
+        "'from openpilot.common.params import Params; Params().put_bool(\"IsLiveStreaming\", True)' && echo READY && exec cat",
+        stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
+      async with asyncio.timeout(6):
+        while await self.tunnel.stdout.readline() != b'READY\n':
+          if self.tunnel.stdout.at_eof(): raise subprocess.CalledProcessError(await self.tunnel.wait() or 1, 'ssh')
     body = json.dumps({'sdp': offer.sdp, 'cameras': [offer.video[0]], 'enabled': True}).encode()
     request = urllib.request.Request(f'http://127.0.0.1:{self.port}/stream', body,
                                      {'Content-Type': 'application/json'})
@@ -37,9 +39,9 @@ class Connection:
     return RTCSessionDescription(answer['sdp'], answer['type'])
 
   async def close(self):
-    if self.tunnel:
-      self.tunnel.terminate()
-      await self.tunnel.wait()
+    if self.tunnel and self.tunnel.returncode is None:
+      self.tunnel.kill()
+      await asyncio.wait_for(self.tunnel.wait(), 1)
 
 
 class Receiver:
@@ -74,15 +76,15 @@ class Receiver:
     self.track = self.depacketizer = self.rtcp = None
 
 
-async def frames(host, camera):
-  connection = Connection(host)
+async def frames(host, camera, identity=None):
+  connection = Connection(host, identity)
   builder = WebRTCOfferBuilder(connection)
   builder.offer_to_receive_video_stream(camera)
   stream = builder.stream()
   receiver = None
   try:
-    await stream.start()
-    await stream.wait_for_connection()
+    await asyncio.wait_for(stream.start(), 12)
+    await asyncio.wait_for(stream.wait_for_connection(), 10)
     receiver = Receiver(stream.get_incoming_video_track(camera))
     while stream.is_connected_and_ready:
       try:
