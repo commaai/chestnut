@@ -1,4 +1,5 @@
 import os
+import pickle
 from pathlib import Path
 
 os.environ.setdefault("DEV", "CPU")
@@ -9,7 +10,7 @@ import torch
 from ultralytics.data.augment import LetterBox
 from ultralytics.engine.results import Results
 from ultralytics.utils import ROOT, YAML, ops
-from tinygrad import Tensor, TinyJit
+from tinygrad import Device, Tensor, TinyJit
 from tinygrad.nn.onnx import OnnxRunner
 
 # tinygrad's examples/yolov8-onnx.py, with Ultralytics preprocessing and results.
@@ -21,12 +22,21 @@ class Vision:
     self.shape = spec.shape[2:]
     self.letterbox = LetterBox(self.shape, auto=False)
     self.names = YAML.load(ROOT / 'cfg/datasets/coco8.yaml')['names']
+    self.cache = Path(os.environ["XDG_CACHE_HOME"]) / f'{name}-{Device.DEFAULT.replace(":", "-")}.jit'
     self.run = TinyJit(lambda x: tuple(y.realize() for y in self.model({self.input: x}).values()))
+    if self.cache.exists():
+      try:
+        with self.cache.open('rb') as file: self.run = pickle.load(file)
+      except Exception: self.cache.unlink(missing_ok=True)
 
   def __call__(self, image):
     resized = self.letterbox(image=image)
     x = np.ascontiguousarray(resized[:, :, ::-1].transpose(2, 0, 1)[None], dtype=np.float32) / 255
     outputs = [torch.from_numpy(y.numpy()) for y in self.run(Tensor(x).realize())]
+    if self.run.cnt == 2:
+      temporary = self.cache.with_suffix('.tmp')
+      with temporary.open('wb') as file: pickle.dump(self.run, file)
+      temporary.replace(self.cache)
     boxes = outputs[0][0]
     assert boxes.shape[1] in (6, 38), "Expected a YOLO26 end-to-end export (nms=False)"
     boxes = boxes[boxes[:, 4] > 0.25]

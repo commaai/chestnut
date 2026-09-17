@@ -10,8 +10,8 @@ from teleoprtc import StreamingOffer, WebRTCOfferBuilder
 from teleoprtc.stream import RTCSessionDescription
 
 class Connection:
-  def __init__(self, host, identity=None):
-    self.host, self.identity = host, identity
+  def __init__(self, host):
+    self.host = host
     self.tunnel = None
     self.port = None
 
@@ -21,14 +21,15 @@ class Connection:
         sock.bind(('127.0.0.1', 0))
         self.port = sock.getsockname()[1]
       self.tunnel = await asyncio.create_subprocess_exec(
-        'ssh', *(['-i', self.identity] if self.identity else []), '-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5',
+        'ssh', '-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5', '-o', 'LogLevel=ERROR',
         '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', '-o', 'GlobalKnownHostsFile=/dev/null',
         '-o', 'ConnectionAttempts=1', '-o', 'ForkAfterAuthentication=no', '-o', 'ExitOnForwardFailure=yes', '-L',
         f'127.0.0.1:{self.port}:127.0.0.1:5001', f'comma@{self.host}',
         'cd /data/openpilot && /usr/local/venv/bin/python -c '
-        "'from openpilot.common.params import Params; Params().put_bool(\"IsLiveStreaming\", True)' && echo READY && exec cat",
+        "'from openpilot.common.params import Params; from openpilot.system.webrtc.helpers import wait_for_webrtcd; "
+        "Params().put_bool(\"IsLiveStreaming\", True); wait_for_webrtcd()' && echo READY && exec cat",
         stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE)
-      async with asyncio.timeout(6):
+      async with asyncio.timeout(11):
         while await self.tunnel.stdout.readline() != b'READY\n':
           if self.tunnel.stdout.at_eof(): raise subprocess.CalledProcessError(await self.tunnel.wait() or 1, 'ssh')
     body = json.dumps({'sdp': offer.sdp, 'cameras': [offer.video[0]], 'enabled': True}).encode()
@@ -76,8 +77,8 @@ class Receiver:
     self.track = self.depacketizer = self.rtcp = None
 
 
-async def frames(host, camera, identity=None):
-  connection = Connection(host, identity)
+async def frames(host, camera):
+  connection = Connection(host)
   builder = WebRTCOfferBuilder(connection)
   builder.offer_to_receive_video_stream(camera)
   stream = builder.stream()

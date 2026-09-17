@@ -10,7 +10,7 @@ Run chat, object detection, segmentation, and image classification with tinygrad
 
 ```sh
 git clone https://github.com/commaai/comma_hack_7.git
-cd chestnut
+cd comma_hack_7
 ./setup.sh
 ```
 
@@ -44,14 +44,12 @@ python examples/02_vision.py zidane.jpg --model segment --output masks.jpg
 
 ### Camera
 
-Run YOLO26 detection or segmentation on a webcam.
-Use `--frames 100` for more. `--source` also accepts a video path or stream URL.
-Add `--preview` for a live preview window
+Run YOLO26 with a live preview
+`--source` accepts a webcam index, video path, or stream URL.
 
 ```sh
-python examples/03_camera.py --source 0
-python examples/03_camera.py --source 0 --model segment
-python examples/03_camera.py --source 0 --preview
+python examples/03_camera.py
+python examples/03_camera.py --model segment
 ```
 
 ### Image classification
@@ -82,7 +80,7 @@ Prefix any example command with `DEV=USB+AMD:LLVM` to run it on chestnut's GPU:
 ```sh
 DEV=USB+AMD:LLVM python examples/01_chat.py
 DEV=USB+AMD:LLVM python examples/02_vision.py zidane.jpg --output boxes.jpg
-DEV=USB+AMD:LLVM python examples/03_camera.py --source 0
+DEV=USB+AMD:LLVM python examples/03_camera.py
 ```
 
 ## Comma cameras
@@ -93,7 +91,6 @@ Stream the comma cameras to your PC. Inference runs on your PC's CPU or a chestn
 
 1. Add your PC's public SSH key to GitHub. On comma, open **Settings -> Developer**, enable **SSH**, and enter your **GitHub username** under **SSH keys**.
 2. Find the comma's IP in **Settings -> Network** and use it as `<comma-ip>` below.
-3. Add `-i /path/to/private_key`.
 
 ### Camera options
 
@@ -101,16 +98,14 @@ Stream the comma cameras to your PC. Inference runs on your PC's CPU or a chestn
 - **Driver:** `--source comma:driver`
 - **Wide road:** `--source comma:wide`
 - Add `--model segment` for segmentation overlay.
-- Add `--preview` for a live preview window.
 
 Run this on your PC:
 
 ```sh
-python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview -i /path/to/private_key
-python examples/03_camera.py --host <comma-ip> --source comma:driver --model segment --preview -i /path/to/private_key
-python examples/03_camera.py --host <comma-ip> --source comma:wide --model segment --preview -i /path/to/private_key
+python examples/03_camera.py --host <comma-ip>
+python examples/03_camera.py --host <comma-ip> --source comma:road
 
-DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip> --source comma:road --model segment --preview -i /path/to/private_key
+DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip>
 ```
 
 ## Performance

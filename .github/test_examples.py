@@ -33,7 +33,7 @@ for model in ('yolo', 'segment'):
     assert np.abs(annotated.astype(float) - image).mean() > 1
     for i in range(10):
       assert cv2.imwrite(str(folder / f'input-{i:05d}.jpg'), image)
-    run('03_camera.py', '--source', str(folder / 'input-%05d.jpg'), '--model', model, cwd=folder)
+    run('03_camera.py', '--source', str(folder / 'input-%05d.jpg'), '--model', model, '--no-preview', cwd=folder)
     frames = sorted((folder / 'frames').glob('*.jpg'))
     assert len(frames) == 10
     for frame in frames:

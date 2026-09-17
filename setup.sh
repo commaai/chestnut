@@ -87,8 +87,9 @@ if ! command -v uv >/dev/null; then
   download https://astral.sh/uv/install.sh .cache/install-uv.sh
   UV_NO_MODIFY_PATH=1 sh .cache/install-uv.sh
 fi
-unset VIRTUAL_ENV
+unset VIRTUAL_ENV PYTHONHOME PYTHONPATH
 uv sync --locked --python 3.12
+grep -qxF 'unset PYTHONHOME PYTHONPATH' .venv/bin/activate || printf '\nunset PYTHONHOME PYTHONPATH\n' >> .venv/bin/activate
 .venv/bin/python tools/setup.py
 echo 'Preparing models...'
 .venv/bin/python tools/export.py
