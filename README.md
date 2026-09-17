@@ -75,12 +75,12 @@ python tools/usb.py
 
 Expected: `chestnut GPU check passed.`
 
-Prefix any example command with `DEV=USB+AMD:LLVM` to run it on chestnut's GPU:
+Prefix any example command with `DEV=USB+AMD` to run it on chestnut's GPU:
 
 ```sh
-DEV=USB+AMD:LLVM python examples/01_chat.py
-DEV=USB+AMD:LLVM python examples/02_vision.py zidane.jpg --output boxes.jpg
-DEV=USB+AMD:LLVM python examples/03_camera.py
+DEV=USB+AMD python examples/01_chat.py
+DEV=USB+AMD python examples/02_vision.py zidane.jpg --output boxes.jpg
+DEV=USB+AMD python examples/03_camera.py
 ```
 
 ## Comma cameras
@@ -105,7 +105,7 @@ Run this on your PC:
 python examples/03_camera.py --host <comma-ip>
 python examples/03_camera.py --host <comma-ip> --source comma:road
 
-DEV=USB+AMD:LLVM python examples/03_camera.py --host <comma-ip>
+DEV=USB+AMD python examples/03_camera.py --host <comma-ip>
 ```
 
 ## Performance
