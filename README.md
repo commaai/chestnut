@@ -9,7 +9,7 @@ Run chat, object detection, segmentation, and image classification with tinygrad
 ## Setup
 
 ```sh
-git clone https://github.com/commaai/chestnut.git
+git clone https://github.com/commaai/comma_hack_7.git
 cd chestnut
 ./setup.sh
 ```
