@@ -67,6 +67,18 @@ Plug in the 12V power and connect the USB3 cable from chestnut's USB3.2 port to 
 
 ![chestnut connections](chestnut.jpg)
 
+<table width="100%">
+  <tr>
+    <td width="50%">Use this 1m cable to connect your chestnut.</td>
+    <td width="50%">Use this 0.3m cable to power the comma.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/bee950a1-e1e8-4e4d-9e38-057443d5b3db" width="100%" /></td>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/b9710663-228e-4ba3-b4a5-52da151deded" width="100%" /></td>
+  </tr>
+</table>
+
+
 In the activated environment, check the connection:
 
 ```sh
